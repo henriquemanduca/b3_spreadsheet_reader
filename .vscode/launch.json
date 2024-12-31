@@ -1,0 +1,25 @@
+{
+    // Use o IntelliSense para saber mais sobre os atributos possíveis.
+    // Focalizar para exibir as descrições dos atributos existentes.
+    // Para obter mais informações, acesse: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Depurador do Python: b3_spreadsheet_reader.py",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "b3_spreadsheet_reader.py",
+            "console": "integratedTerminal",
+            "args": [
+                "-i",
+                "sample.xlsx",
+                "-t",
+                "Movimentação",
+                "-o",
+                "report_debug.txt",
+                "-f",
+                "VGIR12"
+            ]
+        }
+    ]
+}
