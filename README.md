@@ -6,8 +6,6 @@
 
 O propósito principal desse projeto e calcular o preço médio de ativos, tendo como fonte de dados uma planilha (excell/xlsx) disponibilizada através do site da B3 [Área do investidor](https://www.investidor.b3.com.br/login)
 
-Breve descrição do projeto, seu propósito e problema que resolve. Forneça um contexto claro sobre a motivação por trás do desenvolvimento.
-
 ## ✨ Principais Funcionalidades
 
 - Agrupar movimentações: Agrupa por ativos as movimentações registradas categorizando-as
