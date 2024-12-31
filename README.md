@@ -69,5 +69,5 @@ Distribuído sob a licença MIT. Veja `LICENSE` para mais informações.
 
 ## 📧 Contato
 
-Henrique manduca - [Seu LinkedIn](https://linkedin.com/in/seunome)
-Link do Projeto: [https://github.com/seu-usuario/nome-do-projeto](https://github.com/seu-usuario/nome-do-projeto)
+- Henrique Manduca - [LinkedIn](https://linkedin.com/in/henrique-manduca)
+- henriquemanduca@live.com
