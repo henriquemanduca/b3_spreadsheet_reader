@@ -79,7 +79,9 @@ def test_asset_properties(setup_data):
 
 def test_asset_set_unfold_factor(setup_data):
     asset: Asset = setup_data[0]
-    assert asset.unfold_factor == 1
+    data = { "date": "2023-09-26", "factor": 10 }
+    assert asset.unfold_factor['factor'] == 10
 
-    asset.set_unfold_factor(10)
-    assert asset.unfold_factor == 10
+    data = { "date": "2023-09-26", "factor": 20 }
+    asset.set_unfold_factor(data)
+    assert asset.unfold_factor['factor'] == 20

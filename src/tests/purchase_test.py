@@ -30,7 +30,6 @@ def test_create_purchase_no_unfold(setup_row):
 
     assert purchase.operation == OperationType.BUY
     assert purchase.price == 5.60
-    assert purchase.unfold == 1
 
 
 def test_create_purchase_unfold(setup_row):
@@ -41,7 +40,6 @@ def test_create_purchase_unfold(setup_row):
 
     assert purchase.operation == OperationType.SELL
     assert purchase.price == 5.60
-    assert purchase.unfold == 10
     assert purchase.quantity == 2
 
 
@@ -49,4 +47,3 @@ def test_create_create_subscription(setup_row):
     purchase = create_subscription(setup_row)
 
     assert purchase.operation == OperationType.SUBSCRIPTION
-    assert purchase.unfold == 1
