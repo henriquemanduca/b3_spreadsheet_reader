@@ -10,6 +10,7 @@ class Asset:
         self.name = name
         self.movements = []
         self.incomes = []
+        self.unfold_factor = None
 
     @property
     def quantity(self) -> int:
@@ -36,15 +37,15 @@ class Asset:
         buys_cost = 0.0
 
         for item in [item for item in self.movements if item.operation in [OperationType.BUY, OperationType.SUBSCRIPTION]]:
-            buys_qty += item.qty
-            buys_cost += item.qty * (item.price / item.unfold)
+            buys_qty += item.quantity
+            buys_cost += item.quantity * (item.price / item.unfold)
 
         sells_qty = 0
         sells_cost = 0.0
 
         for item in [item for item in self.movements if item.operation == OperationType.SELL]:
-            sells_qty += item.qty
-            sells_cost += item.qty * (item.price / item.unfold)
+            sells_qty += item.quantity
+            sells_cost += item.quantity * (item.price / item.unfold)
 
         qty = buys_qty - sells_qty
         values = buys_cost - sells_cost
@@ -86,6 +87,9 @@ class Asset:
 
     def has_unfold(self) -> bool:
         return len([value for value in self.movements if value.operation in [OperationType.UNFOLD]])
+
+    def set_unfold_factor(self, value: dict):
+        self.unfold_factor = value
 
     def __str__(self) -> str:
         return f'Asset: {self.code} - {self.name}, Quantity: {self.quantity}'
