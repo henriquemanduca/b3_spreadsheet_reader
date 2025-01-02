@@ -1,7 +1,6 @@
 import pytest
 import pandas as pd
 
-
 from src.calculate import read_operations
 from src.asset import Asset
 
@@ -10,7 +9,7 @@ rows = [
     {
         'Entrada/Saída': 'Credito',
         'Data': '06/12/2024',
-        'Produto': 'KNSC11 - KINEA SECURITIES FUNDO DE INVESTIMENTO IMOBILIARIO - FII',
+        'Produto': 'KNSC11 - KINEA SECURITIES FDO. DE INV. IMOB. - FII',
         'Movimentação': 'Transferência - Liquidação',
         'Quantidade': 100,
         'Preço unitário': 8.32,
@@ -42,7 +41,7 @@ rows = [
     {
         'Entrada/Saída': 'Debito',
         'Data': '04/03/2022',
-        'Produto': 'KNSC11 - KINEA SECURITIES FUNDO DE INVESTIMENTO IMOBILIARIO - FII',
+        'Produto': 'KNSC12 - KINEA SECURITIES FUNDO DE INVESTIMENTO IMOBILIARIO - FII',
         'Movimentação': 'Direitos de Subscrição - Exercido',
         'Quantidade': 20,
         'Preço unitário': '-',
@@ -73,6 +72,14 @@ def test_asset_quantity(setup_data):
     assert asset.get_unfolds() == 621
 
 
-def test_asset_quantity(setup_data):
+def test_asset_properties(setup_data):
     asset: Asset = setup_data[0]
     assert asset.quantity == 570
+
+
+def test_asset_set_unfold_factor(setup_data):
+    asset: Asset = setup_data[0]
+    assert asset.unfold_factor == 1
+
+    asset.set_unfold_factor(10)
+    assert asset.unfold_factor == 10
