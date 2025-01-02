@@ -1,3 +1,5 @@
+import json
+
 from typing import Tuple
 from datetime import date, datetime
 from typing import Union
@@ -35,3 +37,15 @@ def get_code_and_name_asset(description: str) -> Tuple[str, str]:
     code = description[0:index-1].strip()
     name = description[index+2:].strip()
     return code, name
+
+
+def read_json(file_path):
+    try:
+        with open(file_path if file_path else './helpers/unfold_helper.json', 'r') as file:
+            return json.load(file)
+    except FileNotFoundError as e:
+        print(f"Erro: O arquivo não foi encontrado - {e}")
+        raise
+    except json.JSONDecodeError as e:
+        print(f"Erro: O conteúdo do arquivo não é um JSON válido - {e}")
+        raise

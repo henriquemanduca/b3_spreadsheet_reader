@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from src.utils import get_code_and_name_asset, get_operation, get_code_and_name_asset, str_to_date
+from src.utils.utils import get_code_and_name_asset, get_operation, get_code_and_name_asset, str_to_date
 from src.movement import OperationType
 
 
