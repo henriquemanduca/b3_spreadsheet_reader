@@ -13,7 +13,7 @@ class Asset:
 
     @property
     def quantity(self) -> int:
-        return self.get_buys() - self.get_sells()
+        return self.get_buys() + self.get_unfolds() - self.get_sells()
 
     @property
     def average_price(self) -> float:
@@ -65,16 +65,23 @@ class Asset:
 
     def get_sells(self) -> int:
         return sum(
-            value.qty
+            value.quantity
             for value in self.movements
             if value.operation == OperationType.SELL
         )
 
     def get_buys(self) -> int:
         return sum(
-            value.qty
+            value.quantity
             for value in self.movements
             if value.operation in [OperationType.BUY, OperationType.SUBSCRIPTION]
+        )
+
+    def get_unfolds(self) -> int:
+        return sum(
+            value.quantity
+            for value in self.movements
+            if value.operation in [OperationType.UNFOLD]
         )
 
     def has_unfold(self) -> bool:

@@ -1,6 +1,6 @@
 from src.sheet import SheetColuns
 from src.movement import Movement, OperationType
-from src.utils import get_operation
+from src.utils.utils import get_operation
 
 
 class Purchase(Movement):
@@ -9,13 +9,6 @@ class Purchase(Movement):
 
         self.price = price
         self.unfold = unfold_factor
-
-    @property
-    def qty(self) -> int:
-        """
-        Unfolded if unfold value exist
-        """
-        return int(self.quantity * self.unfold)
 
     def __str__(self) -> str:
         return super().__str__()
