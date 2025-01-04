@@ -1,4 +1,5 @@
 import pandas as pd
+import logging
 import sys
 
 from typing import List
@@ -63,7 +64,7 @@ def print_assets(output_file: str, assets: List[Asset]):
                 if asset.quantity == 0:
                     continue
 
-                file.write(f'{asset.code}, QTY: {str(asset.quantity).zfill(3)}, Avarege: ${asset.average_price}\n')
+                file.write(f'{asset.code} - QTY: {str(asset.quantity).zfill(3)} - Avarege: ${asset.average_price}\n')
 
                 purchases: List[Purchase] = [
                     pur for pur in asset.movements
@@ -72,11 +73,11 @@ def print_assets(output_file: str, assets: List[Asset]):
 
                 for item in purchases:
                     if item.operation == OperationType.BUY:
-                        file.write(f'BUY : {str(item.quantity).zfill(3)} at ${item.price}\n')
+                        file.write(f'BUY : {str(int(item.quantity)).zfill(3)} at ${item.price}\n')
                     elif item.operation == OperationType.SUBSCRIPTION:
-                        file.write(f'SUB : {str(item.quantity).zfill(3)} at ${item.price}\n')
+                        file.write(f'SUB : {str(int(item.quantity)).zfill(3)} at ${item.price}\n')
                     else:
-                        file.write(f'SELL: {str(item.quantity).zfill(3)} at ${item.price}\n')
+                        file.write(f'SELL: {str(int(item.quantity)).zfill(3)} at ${item.price}\n')
 
                 file.write('-----------------------------\n')
 
@@ -87,6 +88,9 @@ def print_assets(output_file: str, assets: List[Asset]):
 
 
 def calculate_spreadsheet(args):
+    if args.verbose:
+        get_logger().setLevel(logging.DEBUG)
+
     input_file = args.input if args.input else 'sample.xlsx'
     sheet = args.sheet if args.sheet else 'Movimentação'
 

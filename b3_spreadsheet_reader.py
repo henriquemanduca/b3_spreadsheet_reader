@@ -45,6 +45,12 @@ def main():
         required=False
     )
 
+    parser.add_argument(
+        "-v", "--verbose",
+        help="Add debugging output",
+        action="store_true"
+    )
+
     try:
         args = parser.parse_args()
     except SystemExit:

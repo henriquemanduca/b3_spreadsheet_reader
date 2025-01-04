@@ -18,7 +18,7 @@
                 "-o",
                 "report_debug.txt",
                 "-f",
-                "VGIR12"
+                "KNSC11"
             ]
         },
         {
