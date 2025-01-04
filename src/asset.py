@@ -43,12 +43,15 @@ class Asset:
 
             unfold_factor = 1
             if self.has_unfold():
-                unfold_factor = self.unfold_factor['factor'] if item.mov_date <= str_to_date(self.unfold_factor['date'], "%Y-%m-%d") else 1
+                try:
+                   unfold_factor = self.unfold_factor['factor'] if item.mov_date <= str_to_date(self.unfold_factor['date'], "%Y-%m-%d") else 1
+                except TypeError:
+                    unfold_factor = 1
 
             buys_qty += item.quantity * unfold_factor
             buys_cost += (item.quantity * unfold_factor) * (item.price / unfold_factor)
 
-            get_logger().debug(" %s, Qty: %s, Cost: $%f", item.operation, str(int(item.quantity)).zfill(3), buys_cost)
+            get_logger().debug("%s, Qty: %s, Cost: $%s", item.operation, int(item.quantity), "{:.{}f}".format(buys_cost, 2))
 
         sells_qty = 0
         sells_cost = 0.0
@@ -57,19 +60,21 @@ class Asset:
             if getattr(item, 'price', 0.0) == 0.0:
                 continue
 
-            unfold_factor = 1
             if self.has_unfold():
-                unfold_factor = self.unfold_factor['factor'] if item.mov_date <= str_to_date(self.unfold_factor['date'], "%Y-%m-%d") else 1
+                try:
+                   unfold_factor = self.unfold_factor['factor'] if item.mov_date <= str_to_date(self.unfold_factor['date'], "%Y-%m-%d") else 1
+                except TypeError:
+                    unfold_factor = 1
 
             sells_qty += item.quantity * unfold_factor
-            get_logger().debug(" %s, Qty: %s, Cost: $%f", item.operation, str(int(item.quantity)).zfill(3), buys_cost)
+            get_logger().debug("%s, Qty: %s, Cost: $%s", item.operation, int(item.quantity), "{:.{}f}".format(buys_cost, 2))
 
             sells_cost += (item.quantity * unfold_factor) * (item.price / unfold_factor)
 
         qty = buys_qty - sells_qty
         values = (buys_cost - sells_cost) / qty
 
-        get_logger().debug(" Total: %d, Avarege: $%f", qty, values)
+        get_logger().debug("Total: %d, Avarege: $%s", qty, "{:.{}f}".format(values, 2))
 
         return "{:.{}f}".format(values, 2)
 

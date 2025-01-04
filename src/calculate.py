@@ -1,13 +1,14 @@
 import pandas as pd
 import logging
 import sys
+import csv
 
 from typing import List
 
 from src.utils.utils import get_logger, get_code_and_name_asset, read_json
 
 from src.sheet import SheetColuns
-from src.movement import OperationType, MovementValues, create_unfold
+from src.movement import OperationType, MovementValues, operation_labels, create_unfold
 from src.income import IncomeValues
 from src.purchase import Purchase, create_purchase, create_subscription
 from src.asset import Asset, get_or_create_asset
@@ -59,27 +60,37 @@ def read_operations(data_frame, filter):
 
 def print_assets(output_file: str, assets: List[Asset]):
     try:
-        with open(output_file, 'w', encoding='utf-8') as file:
+        headers =  ['ASSET', 'QUANTITY', 'AVERAGE PRICE']
+
+        with open(output_file, mode='w', newline='', encoding='utf-8') as file:
+            writer = csv.writer(file)
+
+            writer.writerow(headers)
+
             for asset in assets:
                 if asset.quantity == 0:
+                    get_logger().debug(f"Asset {asset.code} has 0 quantity")
                     continue
 
-                file.write(f'{asset.code} - QTY: {str(asset.quantity).zfill(3)} - Avarege: ${asset.average_price}\n')
+                get_logger().debug(f"Printing {asset.code}")
+                writer.writerow([
+                    asset.code,
+                    int(asset.quantity),
+                    asset.average_price
+                ])
 
-                purchases: List[Purchase] = [
-                    pur for pur in asset.movements
-                    if pur.operation in [OperationType.BUY, OperationType.SELL, OperationType.SUBSCRIPTION]
-                ]
+                # purchases: List[Purchase] = [
+                #     pur for pur in asset.movements
+                #     if pur.operation in [OperationType.BUY, OperationType.SELL, OperationType.SUBSCRIPTION]
+                # ]
 
-                for item in purchases:
-                    if item.operation == OperationType.BUY:
-                        file.write(f'BUY : {str(int(item.quantity)).zfill(3)} at ${item.price}\n')
-                    elif item.operation == OperationType.SUBSCRIPTION:
-                        file.write(f'SUB : {str(int(item.quantity)).zfill(3)} at ${item.price}\n')
-                    else:
-                        file.write(f'SELL: {str(int(item.quantity)).zfill(3)} at ${item.price}\n')
-
-                file.write('-----------------------------\n')
+                # for purchase in purchases:
+                #     writer.writerow([
+                #         asset.code,
+                #         operation_labels.get(purchase.operation, 'Not found'),
+                #         str(int(purchase.quantity)).zfill(3),
+                #         purchase.price
+                #     ])
 
         get_logger().info(f"Report saved on {output_file}")
     except IOError as e:
@@ -99,6 +110,6 @@ def calculate_spreadsheet(args):
     filter_code = args.filter if args.filter else None
     assets = read_operations(data_frame, filter_code)
 
-    output_file = args.output if args.output else 'report.txt'
+    output_file = args.output if args.output else 'report.csv'
 
     print_assets(output_file, assets)
