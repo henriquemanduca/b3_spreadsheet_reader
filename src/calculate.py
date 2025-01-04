@@ -33,7 +33,7 @@ def read_operations(data_frame, filter):
             data_row = row.to_dict()
             code, name = get_code_and_name_asset(data_row[SheetColuns.NAME.value])
 
-            if filter and not code[:-2] == filter[:-2]:
+            if (filter and not code[:-2] == filter[:-2]) or code[4:] == '12':
                 continue
 
             asset = get_or_create_asset(assets, code, name)
@@ -60,7 +60,7 @@ def read_operations(data_frame, filter):
 
 def print_assets(output_file: str, assets: List[Asset]):
     try:
-        headers =  ['ASSET', 'QUANTITY', 'AVERAGE PRICE']
+        headers =  ['ASSET', 'QUANTITY', 'AVERAGE']
 
         with open(output_file, mode='w', newline='', encoding='utf-8') as file:
             writer = csv.writer(file)

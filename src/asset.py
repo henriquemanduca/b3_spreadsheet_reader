@@ -57,7 +57,7 @@ class Asset:
         sells_cost = 0.0
 
         for item in [item for item in self.movements if item.operation == OperationType.SELL]:
-            if getattr(item, 'price', 0.0) == 0.0:
+            if getattr(item, 'price', 0.0) <= 0.0:
                 continue
 
             if self.has_unfold():
@@ -67,14 +67,14 @@ class Asset:
                     unfold_factor = 1
 
             sells_qty += item.quantity * unfold_factor
-            get_logger().debug("%s, Qty: %s, Cost: $%s", item.operation, int(item.quantity), "{:.{}f}".format(buys_cost, 2))
-
             sells_cost += (item.quantity * unfold_factor) * (item.price / unfold_factor)
+
+            get_logger().debug("%s, Qty: %s, Cost: $%s", item.operation, int(item.quantity), "{:.{}f}".format(sells_cost, 2))
 
         qty = buys_qty - sells_qty
         values = (buys_cost - sells_cost) / qty
 
-        get_logger().debug("Total: %d, Avarege: $%s", qty, "{:.{}f}".format(values, 2))
+        get_logger().debug("Total itens: %d, Avarege: $%s", qty, "{:.{}f}".format(values, 2))
 
         return "{:.{}f}".format(values, 2)
 
