@@ -29,8 +29,8 @@ operation_labels = {
 
 class Movement:
     def __init__(self, date: str, operation: OperationType, quantity: int):
-        from src.utils import str_to_date
-        self.date = str_to_date(date) if date else None
+        from src.utils.utils import str_to_date
+        self.mov_date = str_to_date(date) if date else None
         self.operation = operation
         self.quantity = quantity
 

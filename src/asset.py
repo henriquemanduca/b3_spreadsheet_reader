@@ -1,5 +1,6 @@
 from typing import List
 
+from src.utils.utils import str_to_date, get_logger
 from src.movement import Movement, OperationType
 from src.income import Income
 
@@ -10,10 +11,11 @@ class Asset:
         self.name = name
         self.movements = []
         self.incomes = []
+        self.unfold_factor = None
 
     @property
     def quantity(self) -> int:
-        return self.get_buys() - self.get_sells()
+        return int(self.get_buys() + self.get_unfolds() - self.get_sells())
 
     @property
     def average_price(self) -> float:
@@ -36,49 +38,79 @@ class Asset:
         buys_cost = 0.0
 
         for item in [item for item in self.movements if item.operation in [OperationType.BUY, OperationType.SUBSCRIPTION]]:
-            buys_qty += item.qty
-            buys_cost += item.qty * (item.price / item.unfold)
+            if getattr(item, 'price', 0.0) == 0.0:
+                continue
+
+            unfold_factor = 1
+            if self.has_unfold():
+                unfold_factor = self.unfold_factor['factor'] if item.mov_date <= str_to_date(self.unfold_factor['date'], "%Y-%m-%d") else 1
+
+            buys_qty += item.quantity * unfold_factor
+            buys_cost += (item.quantity * unfold_factor) * (item.price / unfold_factor)
+
+            get_logger().debug(" %s, Qty: %s, Cost: $%f", item.operation, str(int(item.quantity)).zfill(3), buys_cost)
 
         sells_qty = 0
         sells_cost = 0.0
 
         for item in [item for item in self.movements if item.operation == OperationType.SELL]:
-            sells_qty += item.qty
-            sells_cost += item.qty * (item.price / item.unfold)
+            if getattr(item, 'price', 0.0) == 0.0:
+                continue
+
+            unfold_factor = 1
+            if self.has_unfold():
+                unfold_factor = self.unfold_factor['factor'] if item.mov_date <= str_to_date(self.unfold_factor['date'], "%Y-%m-%d") else 1
+
+            sells_qty += item.quantity * unfold_factor
+            get_logger().debug(" %s, Qty: %s, Cost: $%f", item.operation, str(int(item.quantity)).zfill(3), buys_cost)
+
+            sells_cost += (item.quantity * unfold_factor) * (item.price / unfold_factor)
 
         qty = buys_qty - sells_qty
-        values = buys_cost - sells_cost
+        values = (buys_cost - sells_cost) / qty
 
-        return "{:.{}f}".format(values / qty, 2)
+        get_logger().debug(" Total: %d, Avarege: $%f", qty, values)
+
+        return "{:.{}f}".format(values, 2)
 
     def add_movement(self, movement: Movement):
         if movement.operation != OperationType.TRANSFER:
             self.movements.append(movement)
 
-        self.movements = sorted(self.movements, key=lambda item: item.date, reverse=False)
+        self.movements = sorted(self.movements, key=lambda item: item.mov_date, reverse=False)
 
     def add_income(self, income: Income):
         if income.operation == OperationType.INCOME:
             self.incomes.append(income)
 
-        self.incomes = sorted(self.incomes, key=lambda item: item.date, reverse=False)
+        self.incomes = sorted(self.incomes, key=lambda item: item.mov_date, reverse=False)
 
     def get_sells(self) -> int:
         return sum(
-            value.qty
+            value.quantity
             for value in self.movements
             if value.operation == OperationType.SELL
         )
 
     def get_buys(self) -> int:
         return sum(
-            value.qty
+            value.quantity
             for value in self.movements
             if value.operation in [OperationType.BUY, OperationType.SUBSCRIPTION]
         )
 
+    def get_unfolds(self) -> int:
+        return sum(
+            value.quantity
+            for value in self.movements
+            if value.operation in [OperationType.UNFOLD]
+        )
+
     def has_unfold(self) -> bool:
         return len([value for value in self.movements if value.operation in [OperationType.UNFOLD]])
+
+    def set_unfold_factor(self, value: dict):
+        self.unfold_factor = value
 
     def __str__(self) -> str:
         return f'Asset: {self.code} - {self.name}, Quantity: {self.quantity}'

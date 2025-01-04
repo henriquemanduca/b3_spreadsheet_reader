@@ -8,4 +8,3 @@ class SheetColuns(Enum):
     NAME = 'Produto'
     QUANTITY = 'Quantidade'
     PRICE = 'Preço unitário'
-    ULFOLD = 'Desdobro'

@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Depurador do Python: b3_spreadsheet_reader.py",
+            "name": "Depurador: b3_spreadsheet_reader.py",
             "type": "debugpy",
             "request": "launch",
             "program": "b3_spreadsheet_reader.py",
@@ -18,8 +18,18 @@
                 "-o",
                 "report_debug.txt",
                 "-f",
-                "VGIR12"
+                "KNSC11"
             ]
+        },
+        {
+            "name": "Debug Pytest All Tests",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "pytest",
+            "args": [
+                "${workspaceFolder}/src/tests"
+            ],
+            "justMyCode": false
         }
     ]
 }
