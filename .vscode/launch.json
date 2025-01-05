@@ -17,8 +17,9 @@
                 "Movimentação",
                 "-o",
                 "report_debug.csv",
+                "-v",
                 "-f",
-                "STOCK"
+                "OTHER"
             ]
         },
         {

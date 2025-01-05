@@ -1,8 +1,8 @@
 import pytest
 import pandas as pd
 
-from src.calculate import read_operations
-from src.asset import Asset
+from src.service.calculate import read_operations
+from src.models.asset import Asset
 
 
 rows = [

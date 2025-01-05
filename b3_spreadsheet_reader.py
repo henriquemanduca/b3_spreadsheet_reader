@@ -1,12 +1,13 @@
 import argparse
 import sys
 
-from src.calculate import calculate_spreadsheet
+from src.utils.utils import get_logger
+from src.main import import_spreadsheet
 
 
 def main():
     help = """
-    Usage: python b3_shpeadsheet_reader.py -i sample.xlsx -t Movimentação -f STOCK/REIT/OTHER -o report.csv
+    Usage: python b3_shpeadsheet_reader.py -i sample.xlsx -t Movimentação -f STOCK/REIT/OTHER -o b3_sheet_report.csv
     or python b3_shpeadsheet_reader.py -t Movimentação
     """
 
@@ -49,10 +50,16 @@ def main():
     try:
         args = parser.parse_args()
     except SystemExit:
-        LOGGER.info(help)
+        get_logger().info(help)
         sys.exit()
 
-    calculate_spreadsheet(args)
+
+    sheet = args.sheet if args.sheet else 'Movimentação'
+    input_file = args.input if args.input else 'sample.xlsx'
+    output_file = args.output if args.output else 'b3_sheet_report.csv'
+    filter_type = args.filter if args.filter else None
+
+    import_spreadsheet(input=input_file, output=output_file, sheet=sheet, filter=filter_type)
 
 
 if __name__ == "__main__":

@@ -1,8 +1,8 @@
 from datetime import datetime
 
 from src.utils.utils import get_operation, str_to_date
-from src.asset import AssetType, get_code_and_name_asset
-from src.movement import OperationType
+from src.models.asset import AssetType, get_code_and_name_asset
+from src.models.movement import OperationType
 
 
 def test_get_code_and_name_asset():

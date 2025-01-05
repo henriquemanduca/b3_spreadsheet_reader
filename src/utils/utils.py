@@ -4,7 +4,7 @@ import logging
 from datetime import date, datetime
 from typing import Union
 
-from src.movement import OperationType
+from src.models.movement import OperationType
 
 
 LOGGER = logging.getLogger()
@@ -34,18 +34,16 @@ def str_to_date(str_date: str, from_format: str = "%d/%m/%Y") -> Union[date, Non
 def get_operation(operation: str) -> Union[OperationType, None]:
     if operation == 'Credito':
         return OperationType.BUY
-
     elif operation == 'Debito':
         return OperationType.SELL
-
     return None
 
 
-def read_json(file_path):
+def read_json(file_path = None):
     try:
         with open(file_path if file_path else './src/helpers/unfold_helper.json', 'r') as file:
             return json.load(file)
     except FileNotFoundError as e:
-        get_logger().error(f"Erro: O arquivo não foi encontrado - {e}")
+        get_logger().error(f"Error read json!\n{e}")
     except json.JSONDecodeError as e:
-        get_logger().error(f"Erro: O conteúdo do arquivo não é um JSON válido - {e}")
+        get_logger().error(f"Error json not valid!\n{e}")

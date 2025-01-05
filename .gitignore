@@ -3,7 +3,8 @@ report.csv
 report.txt
 report_debug.txt
 report_debug.csv
-assets_report.txt
+
+*.csv
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

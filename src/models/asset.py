@@ -1,10 +1,8 @@
-from typing import List
 from enum import Enum
-from typing import Tuple
 
-from src.utils.utils import str_to_date, get_logger, read_json
-from src.movement import Movement, OperationType
-from src.income import Income
+from src.utils.utils import str_to_date, get_logger
+from src.models.movement import Movement, OperationType
+from src.models.income import Income
 
 
 class AssetType(Enum):
@@ -84,6 +82,14 @@ class Asset:
         get_logger().debug("Total: %d, Avarege: $%s", qty, values)
         return values
 
+    def get_invested_amount(self) -> float:
+        buy_values = sum([it.quantity * it.price for it in self.movements if it.operation in [OperationType.BUY]])
+        sell_values = sum([it.quantity * it.price for it in self.movements if it.operation in [OperationType.SELL]])
+        return buy_values - sell_values
+
+    def get_income_amount(self) -> float:
+        return sum([it.quantity * it.value for it in self.incomes])
+
     def add_movement(self, movement: Movement):
         if movement.operation != OperationType.TRANSFER:
             self.movements.append(movement)
@@ -127,36 +133,7 @@ class Asset:
         return f'Asset: {self.code} - {self.name}, Quantity: {self.quantity}'
 
 
-def get_code_and_name_asset(description: str) -> Tuple[AssetType, str, str]:
-    index = description.find('-')
-
-    if index > 0:
-        code = description[0:index-1].strip()
-        name = description[index+2:].strip()
-
-        if int(code[4:]) in [3, 4]:
-            asset_type = AssetType.STOCK
-
-        elif int(code[4:]) in [11, 12, 13]:
-            asset_type = AssetType.REIT
-
-        return asset_type, code, name
-
-    return AssetType.OTHER, "", description
 
 
-def get_or_create_asset(assets: List[Asset], **kwargs) -> Asset:
-    for item in assets:
-        if item.type in [AssetType.STOCK, AssetType.REIT] and item.code[0:4] == kwargs.get('code')[0:4]:
-            return item
-        elif item.name == kwargs.get('name'):
-            return item
 
-    asset = Asset(asset_type=kwargs.get('asset_type'), code=kwargs.get('code'), name=kwargs.get('name'))
 
-    if asset.unfold_factor == None:
-        asset.set_unfold_factor(read_json(None).get(asset.code))
-
-    assets.append(asset)
-
-    return asset
