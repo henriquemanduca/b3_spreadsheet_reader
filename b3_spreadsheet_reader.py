@@ -1,17 +1,12 @@
 import argparse
-import logging
 import sys
 
 from src.calculate import calculate_spreadsheet
 
-logging.basicConfig()
-LOGGER = logging.getLogger()
-LOGGER.setLevel(logging.INFO)
-
 
 def main():
     help = """
-    Usage: python b3_shpeadsheet_reader.py -i sample.xlsx -t Movimentação -o report.txt
+    Usage: python b3_shpeadsheet_reader.py -i sample.xlsx -t Movimentação -f STOCK/REIT/OTHER -o report.csv
     or python b3_shpeadsheet_reader.py -t Movimentação
     """
 
@@ -41,7 +36,7 @@ def main():
     parser.add_argument(
         '-f', '--filter',
         type=str,
-        help='Filter by code asset',
+        help='Filter by type asset',
         required=False
     )
 

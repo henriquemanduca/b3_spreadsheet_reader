@@ -1,11 +1,13 @@
 from datetime import datetime
 
-from src.utils.utils import get_code_and_name_asset, get_operation, get_code_and_name_asset, str_to_date
+from src.utils.utils import get_operation, str_to_date
+from src.asset import AssetType, get_code_and_name_asset
 from src.movement import OperationType
 
 
 def test_get_code_and_name_asset():
-    code, name = get_code_and_name_asset('VGIR11 - VALORA CRI CDI FUNDO DE INVESTIMENTO IMOBILIÁRIO ')
+    asset_type, code, name = get_code_and_name_asset('VGIR11 - VALORA CRI CDI FUNDO DE INVESTIMENTO IMOBILIÁRIO ')
+    assert asset_type == AssetType.REIT
     assert code == 'VGIR11'
     assert name == 'VALORA CRI CDI FUNDO DE INVESTIMENTO IMOBILIÁRIO'
 

@@ -16,9 +16,9 @@
                 "-t",
                 "Movimentação",
                 "-o",
-                "report_debug.txt",
+                "report_debug.csv",
                 "-f",
-                "VGIR11"
+                "STOCK"
             ]
         },
         {

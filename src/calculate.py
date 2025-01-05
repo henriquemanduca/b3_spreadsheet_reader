@@ -5,13 +5,13 @@ import csv
 
 from typing import List
 
-from src.utils.utils import get_logger, get_code_and_name_asset, read_json
+from src.utils.utils import get_logger, float_format
 
 from src.sheet import SheetColuns
-from src.movement import OperationType, MovementValues, operation_labels, create_unfold
+from src.movement import MovementValues, create_unfold
 from src.income import IncomeValues
-from src.purchase import Purchase, create_purchase, create_subscription
-from src.asset import Asset, get_or_create_asset
+from src.purchase import create_purchase, create_subscription
+from src.asset import Asset, get_or_create_asset, get_code_and_name_asset
 from src.income import create_income
 
 
@@ -24,22 +24,17 @@ def load_from_file(input_file: str, sheet: str):
 
 
 def read_operations(data_frame, filter):
-    unfold_factor_helper = read_json(None)
-
     assets = []
 
     if data_frame is not None:
         for index, row in data_frame.iterrows():
             data_row = row.to_dict()
-            code, name = get_code_and_name_asset(data_row[SheetColuns.NAME.value])
+            asset_type, code, name = get_code_and_name_asset(data_row[SheetColuns.NAME.value])
 
-            if (filter and not code[:-2] == filter[:-2]) or code[4:] == '12':
+            if (filter and not asset_type.name == filter):
                 continue
 
-            asset = get_or_create_asset(assets, code, name)
-
-            if asset.unfold_factor == None:
-                asset.set_unfold_factor(unfold_factor_helper.get(asset.code))
+            asset = get_or_create_asset(assets, asset_type=asset_type, code=code, name=name)
 
             type_row = data_row[SheetColuns.TYPE.value]
 
@@ -60,37 +55,24 @@ def read_operations(data_frame, filter):
 
 def print_assets(output_file: str, assets: List[Asset]):
     try:
-        headers =  ['ASSET', 'QUANTITY', 'AVERAGE']
-
         with open(output_file, mode='w', newline='', encoding='utf-8') as file:
             writer = csv.writer(file)
 
-            writer.writerow(headers)
+            writer.writerow(['ASSET', 'QUANTITY', 'AVERAGE'])
 
             for asset in assets:
                 if asset.quantity == 0:
                     get_logger().debug(f"Asset {asset.code} has 0 quantity")
+                    writer.writerow([asset.code, 0, 0])
                     continue
 
                 get_logger().debug(f"Printing {asset.code}")
+
                 writer.writerow([
                     asset.code,
                     int(asset.quantity),
-                    asset.average_price
+                    float_format(asset.average_price)
                 ])
-
-                # purchases: List[Purchase] = [
-                #     pur for pur in asset.movements
-                #     if pur.operation in [OperationType.BUY, OperationType.SELL, OperationType.SUBSCRIPTION]
-                # ]
-
-                # for purchase in purchases:
-                #     writer.writerow([
-                #         asset.code,
-                #         operation_labels.get(purchase.operation, 'Not found'),
-                #         str(int(purchase.quantity)).zfill(3),
-                #         purchase.price
-                #     ])
 
         get_logger().info(f"Report saved on {output_file}")
     except IOError as e:
@@ -104,12 +86,10 @@ def calculate_spreadsheet(args):
 
     input_file = args.input if args.input else 'sample.xlsx'
     sheet = args.sheet if args.sheet else 'Movimentação'
+    output_file = args.output if args.output else 'report.csv'
+    filter_type = args.filter if args.filter else None
 
     data_frame = load_from_file(input_file, sheet)
-
-    filter_code = args.filter if args.filter else None
-    assets = read_operations(data_frame, filter_code)
-
-    output_file = args.output if args.output else 'report.csv'
+    assets = read_operations(data_frame, filter_type)
 
     print_assets(output_file, assets)

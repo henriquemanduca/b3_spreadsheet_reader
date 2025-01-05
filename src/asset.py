@@ -1,14 +1,25 @@
 from typing import List
+from enum import Enum
+from typing import Tuple
 
-from src.utils.utils import str_to_date, get_logger
+from src.utils.utils import str_to_date, get_logger, read_json
 from src.movement import Movement, OperationType
 from src.income import Income
 
 
+class AssetType(Enum):
+    STOCK = 1
+    # Real Estate Investment Trusts / FIIs
+    REIT = 2
+    # Others
+    OTHER = 3
+
+
 class Asset:
-    def __init__(self, code: str, name: str):
-        self.code = code
-        self.name = name
+    def __init__(self, **kwargs):
+        self.type = kwargs.get('asset_type')
+        self.code = kwargs.get('code')
+        self.name = kwargs.get('name')
         self.movements = []
         self.incomes = []
         self.unfold_factor = None
@@ -20,18 +31,16 @@ class Asset:
     @property
     def average_price(self) -> float:
         """
-        Exemplo Prático:
+        Let's assume you made the following transactions:
+        Purchase 1: 100 shares at $10.00 (total cost: $1000.00 + $5.00 brokerage = $1005.00)
+        Purchase 2: 50 shares at $12.00 (total cost: $600.00 + $3.00 brokerage = $603.00)
+        Sale 1: 75 shares at $15.00 (total value: $1125.00 - $4.00 brokerage = $1121.00)
+        Purchase 3: 100 shares at $13.00 (total cost: $1300.00 + $5.00 brokerage = $1305.00)
 
-        Vamos supor que você fez as seguintes transações:
-            Compra 1: 100 ações a R$10,00 (custo total: R$1000,00 + R$5,00 de corretagem = R$1005,00)
-            Compra 2: 50 ações a R$12,00 (custo total: R$600,00 + R$3,00 de corretagem = R$603,00)
-            Venda 1: 75 ações a R$15,00 (valor total: R$1125,00 - R$4,00 de corretagem = R$1121,00)
-            Compra 3: 100 ações a R$13,00 (custo total: R$1300,00 + R$5,00 de corretagem = R$1305,00)
-
-        Cálculos:
-            Número Total de Ações: 100 + 50 - 75 + 100 = 175 ações
-            Custo Total das Ações: R$1005,00 + R$603,00 - R$1121,00 + R$1305,00 = R$1792,00
-            Preço Médio Ponderado: R$1792,00 / 175 = R$10,24 por ação (aproximadamente)
+        Calculations:
+            Total Number of Shares: 100 + 50 - 75 + 100 = 175 shares
+            Total Cost of Shares: $1005.00 + $603.00 - $1121.00 + $1305.00 = $1792.00
+            Weighted Average Price: $1792.00 / 175 = $10.24 per share (approximately)
         """
 
         buys_qty = 0
@@ -50,14 +59,13 @@ class Asset:
 
             buys_qty += item.quantity * unfold_factor
             buys_cost += (item.quantity * unfold_factor) * (item.price / unfold_factor)
-
             get_logger().debug("%s, Qty: %s, Cost: $%s", item.operation, int(item.quantity), "{:.{}f}".format(buys_cost, 2))
 
         sells_qty = 0
         sells_cost = 0.0
 
         for item in [item for item in self.movements if item.operation == OperationType.SELL]:
-            if getattr(item, 'price', 0.0) <= 0.0:
+            if getattr(item, 'price', 0.0) <= 1.0:
                 continue
 
             if self.has_unfold():
@@ -68,15 +76,13 @@ class Asset:
 
             sells_qty += item.quantity * unfold_factor
             sells_cost += (item.quantity * unfold_factor) * (item.price / unfold_factor)
-
             get_logger().debug("%s, Qty: %s, Cost: $%s", item.operation, int(item.quantity), "{:.{}f}".format(sells_cost, 2))
 
         qty = buys_qty - sells_qty
         values = (buys_cost - sells_cost) / qty
 
-        get_logger().debug("Total itens: %d, Avarege: $%s", qty, "{:.{}f}".format(values, 2))
-
-        return "{:.{}f}".format(values, 2)
+        get_logger().debug("Total: %d, Avarege: $%s", qty, values)
+        return values
 
     def add_movement(self, movement: Movement):
         if movement.operation != OperationType.TRANSFER:
@@ -121,10 +127,36 @@ class Asset:
         return f'Asset: {self.code} - {self.name}, Quantity: {self.quantity}'
 
 
-def get_or_create_asset(assets: List, code: str, name: str) -> Asset:
+def get_code_and_name_asset(description: str) -> Tuple[AssetType, str, str]:
+    index = description.find('-')
+
+    if index > 0:
+        code = description[0:index-1].strip()
+        name = description[index+2:].strip()
+
+        if int(code[4:]) in [3, 4]:
+            asset_type = AssetType.STOCK
+
+        elif int(code[4:]) in [11, 12, 13]:
+            asset_type = AssetType.REIT
+
+        return asset_type, code, name
+
+    return AssetType.OTHER, "", description
+
+
+def get_or_create_asset(assets: List[Asset], **kwargs) -> Asset:
     for item in assets:
-        if item.code[:-2] == code[:-2]:
+        if item.type in [AssetType.STOCK, AssetType.REIT] and item.code[0:4] == kwargs.get('code')[0:4]:
+            return item
+        elif item.name == kwargs.get('name'):
             return item
 
-    assets.append(Asset(code, name))
-    return assets[len(assets)-1]
+    asset = Asset(asset_type=kwargs.get('asset_type'), code=kwargs.get('code'), name=kwargs.get('name'))
+
+    if asset.unfold_factor == None:
+        asset.set_unfold_factor(read_json(None).get(asset.code))
+
+    assets.append(asset)
+
+    return asset
