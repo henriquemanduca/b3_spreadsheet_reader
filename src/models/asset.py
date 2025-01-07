@@ -1,3 +1,5 @@
+from typing import Tuple
+from datetime import date
 from enum import Enum
 
 from src.utils.utils import str_to_date, get_logger
@@ -21,6 +23,8 @@ class Asset:
         self.movements = []
         self.incomes = []
         self.unfold_factor = None
+        self.first_buy = None
+        self.last_buy = None
 
     @property
     def quantity(self) -> int:
@@ -89,6 +93,10 @@ class Asset:
 
     def get_income_amount(self) -> float:
         return sum([it.quantity * it.value for it in self.incomes])
+
+    def get_buy_dates(self) -> Tuple[date, date]:
+        dates = [it.mov_date for it in self.movements if it.operation in [OperationType.BUY]]
+        return dates[0], dates[len(dates)-1]
 
     def add_movement(self, movement: Movement):
         if movement.operation != OperationType.TRANSFER:

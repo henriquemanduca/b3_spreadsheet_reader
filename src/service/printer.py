@@ -2,7 +2,7 @@ import csv
 
 from typing import List
 
-from src.utils.utils import get_logger, float_format
+from src.utils.utils import get_logger, float_format, format_date_pt_br
 from src.models.asset import Asset
 from src.models.wallet import Wallet
 
@@ -13,22 +13,26 @@ def default_printing(file_parts, sufix, assets: List[Asset]):
 
     with open(f"{file_parts[0]}_{sufix}.{file_parts[1]}", mode='w', newline='', encoding='utf-8') as file:
         writer = csv.writer(file)
-        writer.writerow(['ASSET', 'QUANTITY', 'AVERAGE', 'INVESTED', 'INCOME'])
+        writer.writerow(['ASSET', 'QUANTITY', 'AVERAGE', 'INVESTED', 'FIRST BUY', 'LAST ONE', 'INCOME'])
 
         for asset in assets:
             if asset.quantity == 0:
                 name = asset.name if asset.code == '' else asset.code
                 get_logger().debug(f"Asset {name} has 0 quantity")
-                writer.writerow([name, 0, 0, 0, 0])
+                writer.writerow([name, 0, 0, 0, '', '', 0])
                 continue
 
             get_logger().debug(f"Printing {asset.code}")
+
+            first_date, last_date = asset.get_buy_dates()
 
             writer.writerow([
                 asset.code,
                 int(asset.quantity),
                 float_format(asset.average_price),
                 float_format(asset.get_invested_amount()),
+                format_date_pt_br(first_date),
+                format_date_pt_br(last_date),
                 float_format(asset.get_income_amount()),
             ])
 

@@ -1,5 +1,6 @@
 import json
 import logging
+import locale
 
 from datetime import date, datetime
 from typing import Union
@@ -29,6 +30,11 @@ def str_to_date(str_date: str, from_format: str = "%d/%m/%Y") -> Union[date, Non
     except ValueError as e:
         print(f"Error reading str date: {e}")
         return None
+
+
+def format_date_pt_br(date_obj: date) -> str:
+    locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
+    return date_obj.strftime("%d/%m/%Y")
 
 
 def get_operation(operation: str) -> Union[OperationType, None]:
