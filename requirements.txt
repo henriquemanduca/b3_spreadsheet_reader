@@ -2,3 +2,4 @@ xlrd
 openpyxl
 pandas
 pytest
+yfinance

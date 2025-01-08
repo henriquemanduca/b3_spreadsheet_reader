@@ -45,11 +45,3 @@ def get_operation(operation: str) -> Union[OperationType, None]:
     return None
 
 
-def read_json(file_path = None):
-    try:
-        with open(file_path if file_path else './src/helpers/unfold_helper.json', 'r') as file:
-            return json.load(file)
-    except FileNotFoundError as e:
-        get_logger().error(f"Error read json!\n{e}")
-    except json.JSONDecodeError as e:
-        get_logger().error(f"Error json not valid!\n{e}")

@@ -16,10 +16,10 @@
                 "-t",
                 "Movimentação",
                 "-o",
-                "report_debug.csv",
+                "b3_sheet_report.csv",
                 "-v",
                 "-f",
-                "OTHER"
+                "REIT"
             ]
         },
         {

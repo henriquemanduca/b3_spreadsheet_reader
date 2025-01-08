@@ -1,7 +1,7 @@
 import pytest
 import pandas as pd
 
-from src.service.calculate import read_operations
+from src.service.calculate_service import read_operations
 from src.models.asset import Asset
 
 

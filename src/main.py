@@ -1,17 +1,18 @@
 import pandas as pd
-import logging
 import sys
 
 from src.exceptions.exceptions import DataFrameError
 
 from src.utils.utils import get_logger
-from src.service.calculate import read_operations
-from src.service.printer import print_assets_csv
+from src.service.config_service import ConfigService
+from src.service.calculate_service import CalculateService
+from src.service.printer_service import PrinterService
 
 
 def import_spreadsheet(**kwargs):
-    if kwargs.get('verbose'):
-        get_logger().setLevel(logging.DEBUG)
+    config = ConfigService()
+    service = CalculateService(config=config)
+    printer = PrinterService(config=config)
 
     try:
         input_file = kwargs.get('input')
@@ -23,7 +24,7 @@ def import_spreadsheet(**kwargs):
 
     try:
         filter_type = kwargs.get('filter')
-        wallet = read_operations(data_frame, filter_type)
+        wallet = service.read_operations(data_frame, filter_type)
     except DataFrameError as e:
         get_logger().error(f"{e}")
         sys.exit()
@@ -33,7 +34,7 @@ def import_spreadsheet(**kwargs):
 
     try:
         output_file = kwargs.get('output')
-        print_assets_csv(output_file, wallet)
+        printer.print_assets_csv(output_file, wallet)
     except IOError as e:
         get_logger().error(f"Error on printing to csv!\n{e}")
         sys.exit()

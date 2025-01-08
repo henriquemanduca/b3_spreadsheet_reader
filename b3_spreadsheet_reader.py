@@ -1,5 +1,6 @@
 import argparse
 import sys
+import logging
 
 from src.utils.utils import get_logger
 from src.main import import_spreadsheet
@@ -53,6 +54,8 @@ def main():
         get_logger().info(help)
         sys.exit()
 
+    if args.verbose:
+        get_logger().setLevel(logging.DEBUG)
 
     sheet = args.sheet if args.sheet else 'Movimentação'
     input_file = args.input if args.input else 'sample.xlsx'
