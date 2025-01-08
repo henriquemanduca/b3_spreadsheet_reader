@@ -1,7 +1,7 @@
 from enum import Enum
 
 from src.sheet import SheetColuns
-from src.movement import Movement, OperationType
+from src.models.movement import Movement, OperationType
 
 
 class IncomeValues(Enum):
@@ -23,8 +23,8 @@ def create_income(data_row: dict) -> Income:
     qty = data_row[SheetColuns.QUANTITY.value]
 
     try:
-        price = float(data_row[SheetColuns.PRICE.value])
+        income = float(data_row[SheetColuns.PRICE.value])
     except (ValueError, KeyError):
-        price = 0.0
+        income = 0.0
 
-    return Income(date=dt, quantity=qty, value=price)
+    return Income(date=dt, quantity=qty, value=income)

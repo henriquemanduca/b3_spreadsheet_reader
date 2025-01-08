@@ -1,17 +1,14 @@
 import argparse
-import logging
 import sys
+import logging
 
-from src.calculate import calculate_spreadsheet
-
-logging.basicConfig()
-LOGGER = logging.getLogger()
-LOGGER.setLevel(logging.INFO)
+from src.utils.utils import get_logger
+from src.main import import_spreadsheet
 
 
 def main():
     help = """
-    Usage: python b3_shpeadsheet_reader.py -i sample.xlsx -t Movimentação -o report.txt
+    Usage: python b3_shpeadsheet_reader.py -i sample.xlsx -t Movimentação -f STOCK/REIT/OTHER -o b3_sheet_report.csv
     or python b3_shpeadsheet_reader.py -t Movimentação
     """
 
@@ -41,7 +38,7 @@ def main():
     parser.add_argument(
         '-f', '--filter',
         type=str,
-        help='Filter by code asset',
+        help='Filter by type asset',
         required=False
     )
 
@@ -54,10 +51,18 @@ def main():
     try:
         args = parser.parse_args()
     except SystemExit:
-        LOGGER.info(help)
+        get_logger().info(help)
         sys.exit()
 
-    calculate_spreadsheet(args)
+    if args.verbose:
+        get_logger().setLevel(logging.DEBUG)
+
+    sheet = args.sheet if args.sheet else 'Movimentação'
+    input_file = args.input if args.input else 'sample.xlsx'
+    output_file = args.output if args.output else 'b3_sheet_report.csv'
+    filter_type = args.filter if args.filter else None
+
+    import_spreadsheet(input=input_file, output=output_file, sheet=sheet, filter=filter_type)
 
 
 if __name__ == "__main__":

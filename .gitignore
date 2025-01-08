@@ -1,7 +1,13 @@
 sample.xlsx
+report.csv
 report.txt
 report_debug.txt
-assets_report.txt
+report_debug.csv
+
+*.csv
+*.csv#
+
+cache.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

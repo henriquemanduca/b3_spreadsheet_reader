@@ -1,5 +1,5 @@
-from src.income import create_income
-from src.movement import OperationType
+from src.models.income import create_income
+from src.models.movement import OperationType
 
 
 def test_create_income():

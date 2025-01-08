@@ -1,7 +1,7 @@
 import pytest
 
-from src.movement import OperationType
-from src.purchase import Purchase, create_purchase, create_subscription
+from src.models.movement import OperationType
+from src.models.purchase import Purchase, create_purchase, create_subscription
 
 
 @pytest.fixture

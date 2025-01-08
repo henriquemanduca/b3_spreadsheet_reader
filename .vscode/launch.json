@@ -16,9 +16,10 @@
                 "-t",
                 "Movimentação",
                 "-o",
-                "report_debug.txt",
+                "b3_sheet_report.csv",
+                "-v",
                 "-f",
-                "KNSC11"
+                "REIT"
             ]
         },
         {

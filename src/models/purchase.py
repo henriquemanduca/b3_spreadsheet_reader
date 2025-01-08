@@ -1,5 +1,5 @@
 from src.sheet import SheetColuns
-from src.movement import Movement, OperationType
+from src.models.movement import Movement, OperationType
 from src.utils.utils import get_operation
 
 
