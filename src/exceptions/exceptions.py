@@ -1,7 +1,10 @@
 class DataFrameError(ValueError):
-    def __init__(self, menssage="Dataframe not provide!"):
-        self.menssage = menssage
-        super().__init__(self.menssage)
+    def __init__(self, message="Dataframe not provide"):
+        self.message = message
+        super().__init__(self.message)
 
-    def __str__(self):
-        return f"{self.menssage}"
+
+class AssetError(ValueError):
+    def __init__(self, message="Asset not computable"):
+        self.message = message
+        super().__init__(self.message)

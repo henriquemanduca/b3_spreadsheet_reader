@@ -1,0 +1,22 @@
+{
+    "altered_tickers": {
+        "BBPO11": "TVRI11"
+    },
+    "skip": [
+        "CIEL3"
+    ],
+    "unfolds": {
+        "VGIR11": {
+            "date": "2023-09-26",
+            "factor": 10
+        },
+        "KNSC11": {
+            "date": "2023-11-06",
+            "factor": 10
+        },
+        "RBRF11": {
+            "date": "2024-01-30",
+            "factor": 10
+        }
+    }
+}

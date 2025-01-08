@@ -18,8 +18,9 @@ class AssetType(Enum):
 class Asset:
     def __init__(self, **kwargs):
         self.type = kwargs.get('asset_type')
-        self.code = kwargs.get('code')
+        self.ticker = kwargs.get('ticker')
         self.name = kwargs.get('name')
+        self.price = 0.0
         self.movements = []
         self.incomes = []
         self.unfold_factor = None
@@ -138,7 +139,7 @@ class Asset:
         self.unfold_factor = value
 
     def __str__(self) -> str:
-        return f'Asset: {self.code} - {self.name}, Quantity: {self.quantity}'
+        return f'Asset: {self.ticker} - {self.name}, Quantity: {self.quantity}'
 
 
 
