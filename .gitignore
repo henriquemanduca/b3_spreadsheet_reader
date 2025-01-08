@@ -5,6 +5,9 @@ report_debug.txt
 report_debug.csv
 
 *.csv
+*.csv#
+
+cache.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
