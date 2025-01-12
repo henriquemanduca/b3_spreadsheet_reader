@@ -1,11 +1,10 @@
-sample.xlsx
-report.csv
 report.txt
 report_debug.txt
-report_debug.csv
 
 *.csv
 *.csv#
+*.xlsx
+*.xlsx#
 
 cache.json
 
