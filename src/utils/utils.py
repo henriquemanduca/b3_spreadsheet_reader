@@ -29,15 +29,14 @@ def float_format_pt_br(value: float) -> str:
     Returns:
         str: Valor formatado para duas casas decimais
     """
-    return "{:.{}f}".format(value, 2).replace('.', ',')
+    return '{:.{}f}'.format(value, 2).replace('.', ',')
 
 
-def str_to_date(str_date: str, from_format: str = "%d/%m/%Y") -> Union[date, None]:
+def str_to_date(str_date: str, from_format: str = '%d/%m/%Y') -> Union[date, None]:
     try:
         return datetime.strptime(str_date, from_format)
     except ValueError as e:
-        get_logger().error(f"Error reading str date: {e}")
-        return None
+        raise ValueError(f'Error on convert string to date: \n{e}')
 
 
 def round_trunc(value: float) -> float:
@@ -80,14 +79,14 @@ def format_date_pt_br(date_obj: date) -> str:
         TypeError: Se o input não for um date
     """
     if not isinstance(date_obj, date):
-        raise TypeError("Input must be a date object")
+        raise TypeError('Input must be a date object')
 
     try:
         locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
     except locale.Error:
-        return date_obj.strftime("%d/%m/%Y")
+        return date_obj.strftime('%d/%m/%Y')
 
-    return date_obj.strftime("%d/%m/%Y")
+    return date_obj.strftime('%d/%m/%Y')
 
 
 def get_operation(operation: str) -> Union[OperationType, None]:
@@ -104,7 +103,7 @@ def get_operation(operation: str) -> Union[OperationType, None]:
         TypeError: Se o input for um None
     """
     if operation is None:
-        raise TypeError("Operation cannot be None")
+        raise TypeError('Operation cannot be None')
 
     operation_upper = operation.strip().upper()
 
