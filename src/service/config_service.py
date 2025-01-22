@@ -2,14 +2,14 @@ import json
 import os
 
 
-CONFIG_FILE = "configuration.json"
+CONFIG_FILE = 'configuration.json'
 
 
 def empty_config():
     return {
-        "altered_tickers": {},
-        "skip": [],
-        "unfolds": {}
+        'altered_tickers': {},
+        'skip': [],
+        'unfolds': {}
     }
 
 
@@ -29,17 +29,17 @@ class ConfigService():
 
     def get_unfold_factor(self, ticker):
         try:
-            return self.__config["unfolds"][ticker]
+            return self.__config['unfolds'][ticker]
         except Exception:
             return None
 
     def get_altered_ticker(self, ticker):
         try:
-            return self.__config["altered_tickers"][ticker]
+            return self.__config['altered_tickers'][ticker]
         except Exception:
             return None
 
     def get_tickers_to_skip(self,):
-        return self.__config["skip"]
+        return self.__config['skip']
 
 

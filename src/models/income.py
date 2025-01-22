@@ -1,5 +1,7 @@
 from enum import Enum
+from dataclasses import dataclass
 
+from src.utils.utils import str_to_date
 from src.sheet import SheetColuns
 from src.models.movement import Movement, OperationType
 
@@ -8,18 +10,42 @@ class IncomeValues(Enum):
     INCOME = 'Rendimento'
 
 
+@dataclass
 class Income(Movement):
-    def __init__(self, date, quantity: int, value: float):
-        super().__init__(date, OperationType.INCOME, quantity)
+    value: float = 0.0
 
-        self.value = value
+    def __post_init__(self):
+        """
+        Validações e tratamentos pós-inicialização
+        """
+        if self.operation and not self.operation == OperationType.INCOME:
+            raise TypeError('Operation type must be a INCOME')
 
-    def __str__(self) -> str:
-        return super().__str__()
+        self.value = float(self.value or 0.0)
+
+    @classmethod
+    def create(cls, **kwargs):
+        """
+        Método de fábrica para criação de Rendimentos
+
+        Args:
+            **kwargs: Argumentos de inicialização
+
+        Returns:
+            Movement: Nova instância de Redimento
+        """
+        valid_args = {
+            'operation_date', 'quantity', 'value'
+        }
+        filtered_args = {
+            k:v for k, v in kwargs.items() if k in valid_args
+        }
+        filtered_args['operation'] = OperationType.INCOME
+        return cls(**filtered_args)
 
 
-def create_income(data_row: dict) -> Income:
-    dt = data_row[SheetColuns.DATE.value]
+def income_factory(data_row: dict) -> Income:
+    dt = str_to_date(data_row[SheetColuns.DATE.value])
     qty = data_row[SheetColuns.QUANTITY.value]
 
     try:
@@ -27,4 +53,4 @@ def create_income(data_row: dict) -> Income:
     except (ValueError, KeyError):
         income = 0.0
 
-    return Income(date=dt, quantity=qty, value=income)
+    return Income.create(operation_date=dt, quantity=qty, value=income)

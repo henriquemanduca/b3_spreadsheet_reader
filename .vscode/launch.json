@@ -29,7 +29,7 @@
             "request": "launch",
             "module": "pytest",
             "args": [
-                "${workspaceFolder}/src/service/tests",
+                "${workspaceFolder}/src/models/tests/movement_test.py",
                 "-v"
             ],
             "justMyCode": false

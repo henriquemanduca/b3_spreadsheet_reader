@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Tuple, Dict
 from datetime import date
 from enum import Enum
 
@@ -56,7 +56,7 @@ class Asset:
             unfold_factor = 1
             if self.has_unfold():
                 try:
-                   unfold_factor = self.unfold_factor['factor'] if item.mov_date <= str_to_date(self.unfold_factor['date'], "%Y-%m-%d") else 1
+                   unfold_factor = self.unfold_factor['factor'] if item.operation_date <= str_to_date(self.unfold_factor['date'], "%Y-%m-%d") else 1
                 except TypeError:
                     unfold_factor = 1
 
@@ -73,7 +73,7 @@ class Asset:
 
             if self.has_unfold():
                 try:
-                   unfold_factor = self.unfold_factor['factor'] if item.mov_date <= str_to_date(self.unfold_factor['date'], "%Y-%m-%d") else 1
+                   unfold_factor = self.unfold_factor['factor'] if item.operation_date <= str_to_date(self.unfold_factor['date'], "%Y-%m-%d") else 1
                 except TypeError:
                     unfold_factor = 1
 
@@ -96,20 +96,20 @@ class Asset:
         return sum([it.quantity * it.value for it in self.incomes])
 
     def get_buy_dates(self) -> Tuple[date, date]:
-        dates = [it.mov_date for it in self.movements if it.operation in [OperationType.BUY]]
+        dates = [it.operation_date for it in self.movements if it.operation in [OperationType.BUY]]
         return dates[0], dates[len(dates)-1]
 
     def add_movement(self, movement: Movement):
         if movement.operation != OperationType.TRANSFER:
             self.movements.append(movement)
 
-        self.movements = sorted(self.movements, key=lambda item: item.mov_date, reverse=False)
+        self.movements = sorted(self.movements, key=lambda item: item.operation_date, reverse=False)
 
     def add_income(self, income: Income):
         if income.operation == OperationType.INCOME:
             self.incomes.append(income)
 
-        self.incomes = sorted(self.incomes, key=lambda item: item.mov_date, reverse=False)
+        self.incomes = sorted(self.incomes, key=lambda item: item.operation_date, reverse=False)
 
     def get_sells(self) -> int:
         return sum(
@@ -136,6 +136,8 @@ class Asset:
         return len([value for value in self.movements if value.operation in [OperationType.UNFOLD]])
 
     def set_unfold_factor(self, value: dict):
+        if value is not None and not isinstance(value, Dict):
+            raise ValueError("Unfold factor must be a Dict")
         self.unfold_factor = value
 
     def __str__(self) -> str:
