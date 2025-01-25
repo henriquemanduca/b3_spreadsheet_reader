@@ -46,7 +46,7 @@ pytest -v
 
 5. Inicie o projeto com parâmetros
 ```bash
-python b3_shpeadsheet_reader.py --input sample.xlsx --tab Movimentação --output report.txt
+python b3_spreadsheet_reader.py --input sample.xlsx --tab Movimentação --output report.xlsx
 ```
 
 ## 🔧 Configuração

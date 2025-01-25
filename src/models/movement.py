@@ -1,4 +1,7 @@
 from enum import Enum
+from typing import Optional
+from datetime import date, datetime
+from dataclasses import dataclass
 
 from src.sheet import SheetColuns
 
@@ -18,28 +21,55 @@ class OperationType(Enum):
     UNFOLD = 6
 
 
-operation_labels = {
-    OperationType.BUY: "Compra",
-    OperationType.SELL: "Venda",
-    OperationType.TRANSFER: "Transferência",
-    OperationType.SUBSCRIPTION: "Subscrição",
-    OperationType.UNFOLD: "Desdobro"
-}
-
-
+@dataclass
 class Movement:
-    def __init__(self, date: str, operation: OperationType, quantity: int):
-        from src.utils.utils import str_to_date
-        self.mov_date = str_to_date(date) if date else None
-        self.operation = operation
-        self.quantity = quantity
+    operation: OperationType = OperationType.INCOME
+    operation_date: Optional[date] = None
+    quantity: Optional[int] = 0
 
-    def __str__(self) -> str:
-        return f'Operation: {operation_labels.get(self.operation, 'Not found')}, QTY: {self.quantity}'
+    def __post_init__(self):
+        """
+        Validações e tratamentos pós-inicialização
+        """
+        if self.operation_date and not isinstance(self.operation_date, date):
+            raise TypeError('Operation date must be a date')
+
+        if self.operation and not isinstance(self.operation, OperationType):
+            raise TypeError('Operation must be a OperationType')
+
+        if self.quantity and not isinstance(self.quantity, int):
+            raise TypeError('Quantity must be a int')
+
+        self.quantity = int(self.quantity or 0)
+
+    @classmethod
+    def create(cls, **kwargs):
+        """
+        Método de fábrica para criação segura de movimentos
+
+        Args:
+            **kwargs: Argumentos de inicialização
+
+        Returns:
+            Movement: Nova instância do movimento
+        """
+        valid_args = {
+            'operation_date', 'operation', 'quantity'
+        }
+        filtered_args = {
+            k:v for k, v in kwargs.items() if k in valid_args
+        }
+        return cls(**filtered_args)
 
 
-def create_unfold(data_row: dict) -> Movement:
-    dt = data_row[SheetColuns.DATE.value]
+def movement_factory(data_row: dict) -> Movement:
     operation = OperationType.UNFOLD
     qty = data_row[SheetColuns.QUANTITY.value]
-    return Movement(dt, operation, qty)
+    dt = None
+
+    try:
+        dt = datetime.strptime(data_row[SheetColuns.DATE.value], "%d/%m/%Y")
+    except ValueError:
+        raise ValueError('Error on convert operation date')
+
+    return Movement.create(operation=operation, operation_date=dt, quantity=qty)

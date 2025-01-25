@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Tuple, Dict
 from datetime import date
 from enum import Enum
 
@@ -45,7 +45,6 @@ class Asset:
             Total Cost of Shares: $1005.00 + $603.00 - $1121.00 + $1305.00 = $1792.00
             Weighted Average Price: $1792.00 / 175 = $10.24 per share (approximately)
         """
-
         buys_qty = 0
         buys_cost = 0.0
 
@@ -56,7 +55,7 @@ class Asset:
             unfold_factor = 1
             if self.has_unfold():
                 try:
-                   unfold_factor = self.unfold_factor['factor'] if item.mov_date <= str_to_date(self.unfold_factor['date'], "%Y-%m-%d") else 1
+                   unfold_factor = self.unfold_factor['factor'] if item.operation_date <= str_to_date(self.unfold_factor['date'], "%Y-%m-%d") else 1
                 except TypeError:
                     unfold_factor = 1
 
@@ -73,7 +72,7 @@ class Asset:
 
             if self.has_unfold():
                 try:
-                   unfold_factor = self.unfold_factor['factor'] if item.mov_date <= str_to_date(self.unfold_factor['date'], "%Y-%m-%d") else 1
+                   unfold_factor = self.unfold_factor['factor'] if item.operation_date <= str_to_date(self.unfold_factor['date'], "%Y-%m-%d") else 1
                 except TypeError:
                     unfold_factor = 1
 
@@ -81,8 +80,12 @@ class Asset:
             sells_cost += (item.quantity * unfold_factor) * (item.price / unfold_factor)
             get_logger().debug("%s, Qty: %s, Cost: $%s", item.operation, int(item.quantity), "{:.{}f}".format(sells_cost, 2))
 
-        qty = buys_qty - sells_qty
-        values = (buys_cost - sells_cost) / qty
+        try:
+            qty = buys_qty - sells_qty
+            values = (buys_cost - sells_cost) / qty
+        except ZeroDivisionError:
+            get_logger().error("REIT %s has zero quantity", self.ticker)
+            values = 0.0
 
         get_logger().debug("Total: %d, Avarege: $%s", qty, values)
         return values
@@ -96,20 +99,20 @@ class Asset:
         return sum([it.quantity * it.value for it in self.incomes])
 
     def get_buy_dates(self) -> Tuple[date, date]:
-        dates = [it.mov_date for it in self.movements if it.operation in [OperationType.BUY]]
+        dates = [it.operation_date for it in self.movements if it.operation in [OperationType.BUY]]
         return dates[0], dates[len(dates)-1]
 
     def add_movement(self, movement: Movement):
         if movement.operation != OperationType.TRANSFER:
             self.movements.append(movement)
 
-        self.movements = sorted(self.movements, key=lambda item: item.mov_date, reverse=False)
+        self.movements = sorted(self.movements, key=lambda item: item.operation_date, reverse=False)
 
     def add_income(self, income: Income):
         if income.operation == OperationType.INCOME:
             self.incomes.append(income)
 
-        self.incomes = sorted(self.incomes, key=lambda item: item.mov_date, reverse=False)
+        self.incomes = sorted(self.incomes, key=lambda item: item.operation_date, reverse=False)
 
     def get_sells(self) -> int:
         return sum(
@@ -136,6 +139,8 @@ class Asset:
         return len([value for value in self.movements if value.operation in [OperationType.UNFOLD]])
 
     def set_unfold_factor(self, value: dict):
+        if value is not None and not isinstance(value, Dict):
+            raise ValueError("Unfold factor must be a Dict")
         self.unfold_factor = value
 
     def __str__(self) -> str:

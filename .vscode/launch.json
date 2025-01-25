@@ -18,6 +18,7 @@
                 "-o",
                 "b3_sheet_report.csv",
                 "-v",
+                "--no-cache",
                 "-f",
                 "REIT"
             ]
@@ -28,7 +29,8 @@
             "request": "launch",
             "module": "pytest",
             "args": [
-                "${workspaceFolder}/src/tests"
+                "${workspaceFolder}/src/utils/tests/utils_test.py",
+                "-v"
             ],
             "justMyCode": false
         }

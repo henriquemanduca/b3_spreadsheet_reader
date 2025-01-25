@@ -3,7 +3,8 @@
         "BBPO11": "TVRI11"
     },
     "skip": [
-        "CIEL3"
+        "CIEL3",
+        "SPYI11"
     ],
     "unfolds": {
         "VGIR11": {

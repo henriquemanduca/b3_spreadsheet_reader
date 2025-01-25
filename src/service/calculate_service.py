@@ -9,17 +9,17 @@ from src.service.cache_service import CacheService
 from src.service.config_service import ConfigService
 from src.models.asset import AssetType
 from src.models.wallet import Wallet
-from src.models.movement import MovementValues, create_unfold
-from src.models.income import IncomeValues, create_income
-from src.models.purchase import create_purchase, create_subscription
+from src.models.movement import MovementValues, movement_factory
+from src.models.income import IncomeValues, income_factory
+from src.models.purchase import purchase_factory, subscription_factory
 from src.utils.utils import get_logger
 
 
 class CalculateService():
-    def __init__(self, config=ConfigService(), cache=CacheService()):
-        self.cache_service = cache
-        self.config_service = config
-        self.default_wallet = Wallet(self.config_service)
+    def __init__(self, config = None, cache = None):
+        self.cache_service = cache or CacheService()
+        self.config_service = config or ConfigService()
+        self.wallet = Wallet(self.config_service)
 
     def __get_ticker_and_name_asset(self, description: str) -> Tuple[AssetType, str, str]:
         index = description.find('-')
@@ -49,7 +49,7 @@ class CalculateService():
                 return value['price']
 
             asset = yf.Ticker(f"{ticker}.SA")
-            data_history = asset.history(period="1d")
+            data_history = asset.history(period='1d')
 
             if not data_history.empty:
                 price = float(data_history['Close'].iloc[-1])
@@ -77,7 +77,7 @@ class CalculateService():
                 name_value = data_row[SheetColuns.NAME.value]
                 asset_type, ticker, name = self.__get_ticker_and_name_asset(name_value)
             except AssetError as e:
-                self.default_wallet.add_asset(asset_type=AssetType.OTHER, name=name_value)
+                self.wallet.add_asset(asset_type=AssetType.OTHER, name=name_value)
                 get_logger().warning(f"{e.message}: {name_value}")
                 continue
 
@@ -87,7 +87,7 @@ class CalculateService():
             if (filter and not asset_type.name == filter):
                 continue
 
-            asset = self.default_wallet.add_asset(asset_type=asset_type, ticker=ticker, name=name)
+            asset = self.wallet.add_asset(asset_type=asset_type, ticker=ticker, name=name)
 
             if int(asset.price) == 0:
                 asset.price = self.__get_asset_price(asset.ticker)
@@ -95,18 +95,18 @@ class CalculateService():
             type_row = data_row[SheetColuns.TYPE.value]
 
             if type_row == IncomeValues.INCOME.value:
-                asset.add_income(create_income(data_row))
+                asset.add_income(income_factory(data_row))
 
             elif type_row == MovementValues.BY_OR_SELL.value:
-                asset.add_movement(create_purchase(data_row))
+                asset.add_movement(purchase_factory(data_row))
 
             elif type_row == MovementValues.SUBSCRIPTION.value:
-                asset.add_movement(create_subscription(data_row))
+                asset.add_movement(subscription_factory(data_row))
 
             elif type_row == MovementValues.UNFOLD.value:
-                asset.add_movement(create_unfold(data_row))
+                asset.add_movement(movement_factory(data_row))
 
-        return self.default_wallet
+        return self.wallet
 
 
 

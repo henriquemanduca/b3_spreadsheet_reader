@@ -4,13 +4,14 @@ import os
 from datetime import datetime, timedelta
 
 
-CACHE_FILE = "cache.json"
+CACHE_FILE = 'cache.json'
 CACHE_EXPIRATION_DAYS = 1
 
 
 class CacheService():
-    def __init__(self):
+    def __init__(self, reset = False):
         self.__cache = self.__load_from_file()
+        self.reset = reset
 
     def __load_from_file(self):
         if os.path.exists(CACHE_FILE):
@@ -24,7 +25,7 @@ class CacheService():
     def get_value(self, key):
         try:
             value = self.__cache[key]
-            if datetime.fromisoformat(value['timestamp']) > datetime.now() - timedelta(days=CACHE_EXPIRATION_DAYS):
+            if datetime.fromisoformat(value['timestamp']) > datetime.now() - timedelta(days=CACHE_EXPIRATION_DAYS) and self.reset == False:
                 return value
 
             return None

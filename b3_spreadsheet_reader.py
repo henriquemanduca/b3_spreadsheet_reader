@@ -48,6 +48,12 @@ def main():
         action="store_true"
     )
 
+    parser.add_argument(
+        "--no-cache",
+        help="Force new data",
+        action="store_true"
+    )
+
     try:
         args = parser.parse_args()
     except SystemExit:
@@ -61,8 +67,9 @@ def main():
     input_file = args.input if args.input else 'sample.xlsx'
     output_file = args.output if args.output else 'b3_sheet_report.csv'
     filter_type = args.filter if args.filter else None
+    no_cache = args.no_cache
 
-    import_spreadsheet(input=input_file, output=output_file, sheet=sheet, filter=filter_type)
+    import_spreadsheet(input=input_file, output=output_file, sheet=sheet, filter=filter_type, no_cache=no_cache)
 
 
 if __name__ == "__main__":
