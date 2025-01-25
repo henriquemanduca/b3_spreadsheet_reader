@@ -112,12 +112,13 @@ class PrinterService():
             cell.alignment = Alignment(horizontal='center')
 
         for row, asset in enumerate(assets, start=2):
-            if asset.quantity == 0:
-                continue
-
+            asset_value = 0.0
+            asset_alocation = 0.0
             first_date, last_date = asset.get_buy_dates()
-            asset_value = asset.price * asset.quantity
-            asset_alocation = (asset_value / total) * 100
+
+            if asset.quantity > 0:
+                asset_value = asset.price * asset.quantity
+                asset_alocation = (asset_value / total) * 100
 
             sheet.cell(row=row, column=1, value=asset.ticker)
             sheet.cell(row=row, column=2, value=format_date_pt_br(first_date))

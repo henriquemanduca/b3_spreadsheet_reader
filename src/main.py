@@ -36,7 +36,7 @@ def import_spreadsheet(**kwargs):
 
     try:
         output_file = kwargs.get('output')
-        printer.print_to_csv(output_file, wallet)
+        # printer.print_to_csv(output_file, wallet)
         printer.print_to_xlsx(output_file, wallet)
     except IOError as e:
         get_logger().error(f"Error on printing to csv!\n{e}")

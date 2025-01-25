@@ -5,6 +5,7 @@ from dataclasses import dataclass
 
 from src.sheet import SheetColuns
 
+
 class MovementValues(Enum):
     BY_OR_SELL = 'Transferência - Liquidação'
     SUBSCRIPTION = 'Direitos de Subscrição - Exercido'

@@ -43,7 +43,7 @@ def test_movement_custom_creation():
 
 def test_movement_creation_with_none_quantity():
     """
-    Testa criação de Movimento com quantidade None
+    Testa de Movimento com quantidade None
     """
     movement = Movement(quantity=None)
     assert movement.quantity == 0
@@ -51,7 +51,7 @@ def test_movement_creation_with_none_quantity():
 
 def test_movement_invalid_operation_creation():
     """
-    Testa criação de Movimento com operação inválida
+    Testa de Movimento com operação inválida
     """
     with pytest.raises(TypeError, match='Operation must be a OperationType'):
         Movement(operation='INVALID')
@@ -59,7 +59,7 @@ def test_movement_invalid_operation_creation():
 
 def test_movement_invalid_quantity_creation():
     """
-    Testa criação de Movimento com quantidade inválida
+    Testa de Movimento com quantidade inválida
     """
     with pytest.raises(TypeError, match='Quantity must be a int'):
          Movement(quantity='50')
@@ -80,7 +80,7 @@ def test_movement_create_method():
 
 def test_movement_factory_success(setup_data):
     """
-    Testa função fabrica de Movimentos
+    Testa fabrica de Movimentos
     """
     movement = movement_factory(data_row=setup_data)
 
@@ -92,7 +92,7 @@ def test_movement_factory_success(setup_data):
 
 def test_movement_factory_fail_date(setup_data):
     """
-    Testa função fabrica de Movimentos
+    Testa fabrica de Movimentos com data inválida
     """
     setup_data['Data'] = '2024'
     with pytest.raises(ValueError, match='Error on convert operation date'):

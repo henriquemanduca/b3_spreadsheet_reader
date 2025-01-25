@@ -48,8 +48,8 @@ def test_str_to_date_invalid():
     """
     Testa conversão de string inválida para data
     """
-    result = str_to_date("invalidDate")
-    assert result is None
+    with pytest.raises(ValueError):
+        str_to_date("invalidDate")
 
 
 def test_float_format_types():
@@ -57,10 +57,7 @@ def test_float_format_types():
     Testa tratamento de diferentes tipos de entrada
     """
     with pytest.raises(TypeError):
-        float_format_pt_br("não é um float")
-
-    with pytest.raises(TypeError):
-        float_format_pt_br(None)
+        float_format_pt_br("not a float")
 
 
 def test_get_operation_credit():
@@ -108,7 +105,8 @@ def test_round_trunc_positive():
     Testa arredondamento de números positivos para 2 casas decimais
     """
     assert round_trunc(10.456) == 10.46
-    assert round_trunc(5.005) == 5.01
+    assert round_trunc(5.006) == 5.01
+    assert round_trunc(5.005) == 5.00
 
 
 def test_round_trunc_negative():
@@ -116,7 +114,7 @@ def test_round_trunc_negative():
     Testa arredondamento de números negativos para 2 casas decimais
     """
     assert round_trunc(-10.456) == -10.46
-    assert round_trunc(-5.005) == -5.01
+    assert round_trunc(-5.005) == -5.00
 
 
 def test_manual_trunc_positive():

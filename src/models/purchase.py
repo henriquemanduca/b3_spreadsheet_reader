@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from src.sheet import SheetColuns
 from src.models.movement import Movement, OperationType
-from src.utils.utils import get_operation, str_to_date
+from src.utils.utils import get_operation, str_to_date, get_logger
 
 
 @dataclass
@@ -13,6 +13,7 @@ class Purchase(Movement):
         """
         Validações e tratamentos pós-inicialização
         """
+        super().__post_init__()
         self.price = float(self.price or 0.0)
 
     @classmethod

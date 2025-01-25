@@ -8,7 +8,7 @@ from src.models.movement import OperationType
 
 
 LOGGER = logging.getLogger()
-LOGGER.setLevel(logging.INFO)
+LOGGER.setLevel(logging.DEBUG)
 console_handler = logging.StreamHandler()
 formatter = logging.Formatter('%(levelname)s: %(message)s')
 console_handler.setFormatter(formatter)
@@ -29,6 +29,9 @@ def float_format_pt_br(value: float) -> str:
     Returns:
         str: Valor formatado para duas casas decimais
     """
+    if not isinstance(value, float):
+        raise TypeError('Input must be a float value')
+
     return '{:.{}f}'.format(value, 2).replace('.', ',')
 
 
@@ -109,6 +112,7 @@ def get_operation(operation: str) -> Union[OperationType, None]:
 
     if operation_upper == 'CREDITO':
         return OperationType.BUY
+
     elif operation_upper == 'DEBITO':
         return OperationType.SELL
 

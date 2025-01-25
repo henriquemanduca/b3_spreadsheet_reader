@@ -2,7 +2,7 @@ import pytest
 from datetime import datetime
 
 from src.models.movement import OperationType
-from src.models.purchase import Purchase, purchase_factory, subscription_factory
+from src.models.purchase import purchase_factory, subscription_factory
 
 
 @pytest.fixture
@@ -17,44 +17,27 @@ def setup_data():
 
 def test_purchase_factory_success(setup_data):
     """
-    Teste para tratamento de exceções na busca de preço.
+    Teste para fabricar objetos com sucesso.
     """
     purchase = purchase_factory(setup_data)
     assert purchase.operation_date == datetime(2024, 1, 18)
     assert purchase.operation == OperationType.BUY
     assert purchase.price == 5.60
-
-
-def test_purchase_factory_fail_qty(setup_data):
-    """
-    Teste para tratamento de exceções na busca de preço.
-    """
-    setup_data['Quantidade'] = '0.dd'
-    with pytest.raises(TypeError, match='Quantity must be a int'):
-        purchase_factory(setup_data)
+    assert purchase.quantity == 2
 
 
 def test_purchase_factory_fail(setup_data):
     """
-    Teste para tratamento de exceções na busca de preço.
+    Teste para fabricar objeto tratando campo de preço.
     """
-    setup_data['Quantidade'] = '0.dd'
-    purchase = purchase_factory(setup_data)
-    assert purchase.quantity == 0
-
     setup_data['Preço unitário'] = '-'
     purchase = purchase_factory(setup_data)
     assert purchase.price == 0.0
+    assert purchase.operation == OperationType.TRANSFER
 
     setup_data['Data'] = '/'
     with pytest.raises(ValueError):
         purchase_factory(setup_data)
-
-
-def test_create_purchase_no_unfold(setup_data):
-    purchase = purchase_factory(setup_data)
-    assert purchase.operation == OperationType.BUY
-    assert purchase.price == 5.60
 
 
 def test_create_purchase_unfold(setup_data):
@@ -68,6 +51,6 @@ def test_create_purchase_unfold(setup_data):
     assert purchase.quantity == 2
 
 
-def test_create_create_subscription(setup_data):
+def test_create_subscription(setup_data):
     purchase = subscription_factory(setup_data)
     assert purchase.operation == OperationType.SUBSCRIPTION

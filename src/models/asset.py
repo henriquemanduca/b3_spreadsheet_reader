@@ -45,7 +45,6 @@ class Asset:
             Total Cost of Shares: $1005.00 + $603.00 - $1121.00 + $1305.00 = $1792.00
             Weighted Average Price: $1792.00 / 175 = $10.24 per share (approximately)
         """
-
         buys_qty = 0
         buys_cost = 0.0
 
@@ -81,8 +80,12 @@ class Asset:
             sells_cost += (item.quantity * unfold_factor) * (item.price / unfold_factor)
             get_logger().debug("%s, Qty: %s, Cost: $%s", item.operation, int(item.quantity), "{:.{}f}".format(sells_cost, 2))
 
-        qty = buys_qty - sells_qty
-        values = (buys_cost - sells_cost) / qty
+        try:
+            qty = buys_qty - sells_qty
+            values = (buys_cost - sells_cost) / qty
+        except ZeroDivisionError:
+            get_logger().error("REIT %s has zero quantity", self.ticker)
+            values = 0.0
 
         get_logger().debug("Total: %d, Avarege: $%s", qty, values)
         return values
