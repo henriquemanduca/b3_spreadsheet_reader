@@ -91,9 +91,17 @@ class Asset:
         return values
 
     def get_invested_amount(self) -> float:
+        """
+        Calcula o valor total investido, considerando compras e vendas.
+
+        Retorna o valor investido, garantindo que não seja um número negativo.
+
+        Returns:
+            float: Valor total investido, sendo no mínimo zero.
+        """
         buy_values = sum([it.quantity * it.price for it in self.movements if it.operation in [OperationType.BUY]])
         sell_values = sum([it.quantity * it.price for it in self.movements if it.operation in [OperationType.SELL]])
-        return buy_values - sell_values
+        return max(0, buy_values - sell_values)
 
     def get_income_amount(self) -> float:
         return sum([it.quantity * it.value for it in self.incomes])
